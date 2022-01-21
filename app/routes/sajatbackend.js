@@ -30,5 +30,28 @@ module.exports = function(app) {
     })
     connection.end()
   })
+
+  app.post('/ert_felvi', (req, res) => {
+
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+    })
+
+    connection.connect()
+    
+
+    connection.query("INSERT INTO ertekeles (ert_id, Etterem_id, ert) VALUES (NULL, '"+req.body.bevitel1+"', '"+req.body.bevitel2+"')", function (err, rows, fields) {
+     if (err) throw err
+      res.send(rows)
+      console.log(rows)
+    })
+
+    connection.end()
+})
   
 };

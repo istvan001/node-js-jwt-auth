@@ -9,6 +9,7 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(express.static('kepek'))
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
