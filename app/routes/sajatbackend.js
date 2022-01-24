@@ -53,5 +53,28 @@ module.exports = function(app) {
 
     connection.end()
 })
+
+app.post('/torol', (req, res) => {
+
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+  })
+
+  connection.connect()
+
+  connection.query("DELETE FROM ertekeles WHERE Etterem_id=('"+req.body.bevitel1+"')", function (err, rows, fields) {
+    if (err) throw err
+      res.send("sikerült")
+      console.log("sikerült")
+  })
+
+  connection.end()
+})
+
   
 };
