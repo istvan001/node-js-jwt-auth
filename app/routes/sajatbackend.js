@@ -31,6 +31,27 @@ module.exports = function(app) {
     connection.end()
   })
 
+  app.get('/velemenyek', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+    user: 'asztalfoglalas',
+    password: 'istván',
+    database: 'asztalfoglalas',
+    acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('SELECT * FROM velemenyek', function (err, rows, fields) {
+      if (err) throw err
+      
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
+
   app.post('/ert_felvi', (req, res) => {
 
     var mysql = require('mysql')
@@ -76,5 +97,51 @@ app.post('/torol', (req, res) => {
   connection.end()
 })
 
+app.post('/torol2', (req, res) => {
+
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+  })
+
+  connection.connect()
+
+  connection.query("DELETE FROM velemenyek WHERE velemenyid=('"+req.body.bevitel1+"')", function (err, rows, fields) {
+    if (err) throw err
+      res.send("sikerült")
+      console.log("sikerült")
+  })
+
+  connection.end()
+})
+
+
+app.post('/kereses', (req, res) => {
+
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+  })
+
+  connection.connect()
+
+  let sz='SELECT * from velemenyek WHERE velemenyek.velemeny like "%'+req.body.bevitel1+'%"';
+  console.log(sz);
+  connection.query(sz, function (err, rows, fields) {
+    if (err) throw err
+      res.send(rows)
+      console.log(rows)
+  })
+
+  connection.end()
+})
   
 };
