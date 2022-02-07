@@ -1,6 +1,8 @@
 const { authJwt } = require("../middleware");
 const controller = require("../controllers/user.controller");
 
+const fileupload = require("express-fileupload");
+
 module.exports = function(app) {
   app.use(function(req, res, next) {
     res.header(
@@ -88,7 +90,7 @@ app.post('/torol', (req, res) => {
 
   connection.connect()
 
-  connection.query("DELETE FROM ertekeles WHERE Etterem_id=('"+req.body.bevitel1+"')", function (err, rows, fields) {
+  connection.query("DELETE FROM etterem WHERE id=('"+req.body.bevitel1+"')", function (err, rows, fields) {
     if (err) throw err
       res.send("sikerült")
       console.log("sikerült")
@@ -142,6 +144,70 @@ app.post('/kereses', (req, res) => {
   })
 
   connection.end()
+})
+
+
+app.post('/kereses2', (req, res) => {
+
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+  })
+
+  connection.connect()
+
+  let sz='SELECT * from etterem WHERE etterem.nev like "%'+req.body.bevitel1+'%"';
+  console.log(sz);
+  connection.query(sz, function (err, rows, fields) {
+    if (err) throw err
+      res.send(rows)
+      console.log(rows)
+  })
+
+  connection.end()
+})
+  
+
+
+app.use(fileupload());
+  app.post("/upload", (req, res) => {
+    const newpath = "./kepek/";
+    const file = req.files.file;
+    const filename = file.name;
+  
+    file.mv(`${newpath}${filename}`, (err) => {
+      if (err) {
+        return res.status(500).send({ message: "File upload failed", code: 200 });
+      }
+        return res.status(200).send({ message: "File Uploaded", code: 200 });
+    });
+  });
+
+  app.post('/etterem_felvi', (req, res) => {
+
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+    })
+
+    connection.connect()
+    
+
+    connection.query("INSERT INTO etterem VALUES (NULL,'"+req.body.bevitel1+"','"+req.body.bevitel2+"','"+req.body.bevitel3+"','"+req.body.bevitel4+"','"+req.body.bevitel5+"')", function (err, rows, fields) {
+     if (err) throw err
+      res.send("sikerült")
+      console.log("sikerült")
+    })
+
+    connection.end()
 })
   
 };
