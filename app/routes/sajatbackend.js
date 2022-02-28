@@ -33,6 +33,29 @@ module.exports = function(app) {
     connection.end()
   })
 
+
+  app.get('/ertekelesdb', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+    user: 'asztalfoglalas',
+    password: 'istván',
+    database: 'asztalfoglalas',
+    acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('SELECT ertekeles.Etterem_id,etterem.nev,(Count(ertekeles.ert)) AS db , AVG(ertekeles.ert) AS atlag FROM ertekeles INNER JOIN etterem ON etterem.id=ertekeles.Etterem_id GROUP BY ertekeles.Etterem_id ', function (err, rows, fields) {
+      if (err) throw err
+      
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
+
+
   app.get('/velemenyek', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
@@ -75,6 +98,30 @@ module.exports = function(app) {
     })
 
     connection.end()
+})
+
+
+app.post('/vfelvi', (req, res) => {
+
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+user: 'asztalfoglalas',
+password: 'istván',
+database: 'asztalfoglalas',
+acquireTimeout: 1000000
+  })
+
+  connection.connect()
+  
+
+  connection.query("INSERT INTO velemenyek (velemenyid,Etteremid,velemeny_nev,velemeny) VALUES (NULL, '"+req.body.bevitel1+"', '"+req.body.bevitel2+"', '"+req.body.bevitel3+"')", function (err, rows, fields) {
+   if (err) throw err
+    res.send(rows)
+    console.log(rows)
+  })
+
+  connection.end()
 })
 
 app.post('/torol', (req, res) => {
@@ -171,6 +218,7 @@ app.post('/kereses2', (req, res) => {
   connection.end()
 })
   
+
 
 
 app.use(fileupload());
