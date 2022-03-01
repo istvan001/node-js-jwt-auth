@@ -318,5 +318,28 @@ app.use(fileupload());
 
     connection.end()
 })
+
+app.post('/rendezveny', (req, res) => {
+
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+user: 'asztalfoglalas',
+password: 'istván',
+database: 'asztalfoglalas',
+acquireTimeout: 1000000
+  })
+
+  connection.connect()
+  
+  
+  connection.query("INSERT INTO rendezveny VALUES (NULL,4,'"+req.body.bevitel1+"','"+req.body.bevitel2+"','"+req.body.bevitel3+"','"+req.body.bevitel4+"',0)", function (err, rows, fields) {
+   if (err) throw err
+    res.send("sikerült")
+    console.log("sikerült")
+  })
+
+  connection.end()
+})
   
 };
