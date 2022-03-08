@@ -33,6 +33,27 @@ module.exports = function(app) {
     connection.end()
   })
 
+  app.get('/rendezveny', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+    user: 'asztalfoglalas',
+    password: 'istván',
+    database: 'asztalfoglalas',
+    acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('SELECT * FROM rendezveny', function (err, rows, fields) {
+      if (err) throw err
+      
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
+
 
   app.get('/ertekelesdb', (req, res) => {
     var mysql = require('mysql')
@@ -56,7 +77,8 @@ module.exports = function(app) {
   })
 
 
-  app.get('/velemenyek', (req, res) => {
+  app.post('/velemenyek', (req, res) => {
+
     var mysql = require('mysql')
     var connection = mysql.createConnection({
     host: 's1.siralycore.hu',
@@ -65,15 +87,15 @@ module.exports = function(app) {
     database: 'asztalfoglalas',
     acquireTimeout: 1000000
     })
-      
+  
     connection.connect()
-      
-    connection.query('SELECT * FROM velemenyek', function (err, rows, fields) {
+  
+    connection.query("SELECT * FROM velemenyek WHERE Etteremid="+req.body.bevitel1, function (err, rows, fields) {
       if (err) throw err
-      
-      console.log(rows)
-      res.send(rows)
+        res.send(rows)
+        console.log("sikerült")
     })
+  
     connection.end()
   })
 
