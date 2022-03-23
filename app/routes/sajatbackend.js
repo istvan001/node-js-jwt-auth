@@ -45,7 +45,7 @@ module.exports = function(app) {
       
     connection.connect()
       
-    connection.query('SELECT * FROM rendezveny', function (err, rows, fields) {
+    connection.query('SELECT rendezveny.etterem_id,rendezveny.felhasznalo,rendezveny.telefon,rendezveny.email,rendezveny.idopont,rendezveny.foglalt,etterem.nev FROM rendezveny INNER JOIN etterem on rendezveny.etterem_id=etterem.id ORDER BY rendezveny.idopont DESC', function (err, rows, fields) {
       if (err) throw err
       
       console.log(rows)
@@ -67,7 +67,7 @@ module.exports = function(app) {
       
     connection.connect()
       
-    connection.query('SELECT ertekeles.Etterem_id,etterem.nev,(Count(ertekeles.ert)) AS db , AVG(ertekeles.ert) AS atlag FROM ertekeles INNER JOIN etterem ON etterem.id=ertekeles.Etterem_id GROUP BY ertekeles.Etterem_id ', function (err, rows, fields) {
+    connection.query('SELECT * FROM ertekeles2', function (err, rows, fields) {
       if (err) throw err
       
       console.log(rows)
@@ -94,6 +94,28 @@ module.exports = function(app) {
       if (err) throw err
         res.send(rows)
         console.log("sikerült")
+    })
+  
+    connection.end()
+  })
+  
+  app.post('/szemelykereso', (req, res) => {
+
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+    user: 'asztalfoglalas',
+    password: 'istván',
+    database: 'asztalfoglalas',
+    acquireTimeout: 1000000
+    })
+  
+    connection.connect()
+    let sz='SELECT rendezveny.etterem_id,rendezveny.felhasznalo,rendezveny.telefon,rendezveny.email,rendezveny.idopont,rendezveny.foglalt,etterem.nev FROM rendezveny INNER JOIN etterem on rendezveny.etterem_id=etterem.id WHERE rendezveny.felhasznalo Like "%'+req.body.bevitel1+'%" ORDER BY rendezveny.idopont DESC';
+    connection.query(sz, function (err, rows, fields) {
+      if (err) throw err
+        res.send(rows)
+        console.log(rows)
     })
   
     connection.end()
@@ -357,8 +379,8 @@ acquireTimeout: 1000000
   
   connection.query("INSERT INTO rendezveny VALUES (NULL,'"+req.body.bevitel1+"','"+req.body.bevitel2+"','"+req.body.bevitel3+"','"+req.body.bevitel4+"','"+req.body.bevitel5+"',0)", function (err, rows, fields) {
    if (err) throw err
-    res.send("sikerült")
-    console.log("sikerült")
+    res.send(rows)
+    
   })
 
   connection.end()
