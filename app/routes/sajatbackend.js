@@ -121,6 +121,28 @@ module.exports = function(app) {
     connection.end()
   })
 
+  app.post('/datumkereso', (req, res) => {
+
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+    user: 'asztalfoglalas',
+    password: 'istván',
+    database: 'asztalfoglalas',
+    acquireTimeout: 1000000
+    })
+  
+    connection.connect()
+    let sz='SELECT rendezveny.etterem_id,rendezveny.felhasznalo,rendezveny.telefon,rendezveny.email,rendezveny.idopont,rendezveny.foglalt,etterem.nev FROM rendezveny INNER JOIN etterem on rendezveny.etterem_id=etterem.id WHERE rendezveny.idopont='+req.body.bevitel1+' ORDER BY rendezveny.idopont DESC';
+    connection.query(sz, function (err, rows, fields) {
+      if (err) throw err
+        res.send(rows)
+        console.log(rows)
+    })
+  
+    connection.end()
+  })
+
   app.post('/ert_felvi', (req, res) => {
 
     var mysql = require('mysql')
