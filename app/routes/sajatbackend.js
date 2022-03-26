@@ -95,7 +95,28 @@ module.exports = function(app) {
     })
     connection.end()
   })
+ 
 
+  app.get('/rendezveny2', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+    host: 's1.siralycore.hu',
+    user: 'asztalfoglalas',
+    password: 'istván',
+    database: 'asztalfoglalas',
+    acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('SELECT rendezveny.idopont FROM rendezveny', function (err, rows, fields) {
+      if (err) throw err
+      
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
 
   app.get('/ertekelesdb', (req, res) => {
     var mysql = require('mysql')
