@@ -97,7 +97,7 @@ module.exports = function(app) {
   })
  
 
-  app.get('/rendezveny2', (req, res) => {
+  app.post('/rendezveny2', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
     host: 's1.siralycore.hu',
@@ -108,8 +108,8 @@ module.exports = function(app) {
     })
       
     connection.connect()
-      
-    connection.query('SELECT rendezveny.idopont FROM rendezveny', function (err, rows, fields) {
+    let sz='SELECT count(idopont) FROM `rendezveny` WHERE idopont="'+req.body.bevitel1+'"'   
+    connection.query(sz, function (err, rows, fields) {
       if (err) throw err
       
       console.log(rows)
