@@ -470,7 +470,7 @@ app.use(fileupload());
     connection.end()
 })
 
-app.post('/rendezveny', (req, res) => {
+app.post('/rendezvenyfeltoltes', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
