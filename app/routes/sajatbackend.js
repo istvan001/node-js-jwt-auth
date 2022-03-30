@@ -87,7 +87,7 @@ module.exports = function(app) {
       
     connection.connect()
       
-    connection.query('SELECT rendezveny.etterem_id,rendezveny.felhasznalo,rendezveny.telefon,rendezveny.email,rendezveny.idopont,rendezveny.foglalt,etterem.nev FROM rendezveny INNER JOIN etterem on rendezveny.etterem_id=etterem.id ORDER BY rendezveny.idopont DESC', function (err, rows, fields) {
+    connection.query('SELECT rendezveny.rendezveny_id, rendezveny.etterem_id,rendezveny.felhasznalo,rendezveny.telefon,rendezveny.email,rendezveny.idopont,rendezveny.foglalt,etterem.nev FROM rendezveny INNER JOIN etterem on rendezveny.etterem_id=etterem.id ORDER BY rendezveny.idopont DESC', function (err, rows, fields) {
       if (err) throw err
       
       console.log(rows)
@@ -107,8 +107,9 @@ module.exports = function(app) {
     acquireTimeout: 1000000
     })
       
+    
     connection.connect()
-    let sz='SELECT count(idopont) FROM `rendezveny` WHERE idopont="'+req.body.bevitel1+'"'   
+    let sz='SELECT count(idopont) AS"db" FROM `rendezveny` WHERE idopont="'+req.body.bevitel1+'" AND etterem_id='+req.body.bevitel2+''   
     connection.query(sz, function (err, rows, fields) {
       if (err) throw err
       
@@ -275,7 +276,27 @@ app.post('/torol', (req, res) => {
 
   connection.end()
 })
+app.post('/rendezvenytorles', (req, res) => {
 
+  var mysql = require('mysql')
+  var connection = mysql.createConnection({
+  host: 's1.siralycore.hu',
+  user: 'asztalfoglalas',
+  password: 'istván',
+  database: 'asztalfoglalas',
+  acquireTimeout: 1000000
+  })
+
+  connection.connect()
+
+  connection.query("DELETE FROM rendezveny WHERE rendezveny_id='"+req.body.bevitel1+"'", function (err, rows, fields) {
+    if (err) throw err
+      res.send(rows)
+      console.log(rows)
+  })
+
+  connection.end()
+})
 app.post('/torol2', (req, res) => {
 
   var mysql = require('mysql')
