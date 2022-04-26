@@ -1,7 +1,7 @@
 module.exports = {
-  HOST: "s1.siralycore.hu",
-  USER: "asztalfoglalas",
-  PASSWORD: "istván",
+  HOST: "localhost",
+  USER: "root",
+  PASSWORD: "",
   DB: "asztalfoglalas",
   dialect: "mysql",
   pool: {

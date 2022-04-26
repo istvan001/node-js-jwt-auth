@@ -3,6 +3,11 @@ const controller = require("../controllers/user.controller");
 
 const fileupload = require("express-fileupload");
 
+const host = "localhost";
+const username = "root";
+const passwd = "";
+const db = "asztalfoglalas";
+
 module.exports = function(app) {
   app.use(function(req, res, next) {
     res.header(
@@ -12,16 +17,130 @@ module.exports = function(app) {
     next();
   });
 
+  app.get('/etterem', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('SELECT * from etterem', function (err, rows, fields) {
+      if (err) throw err
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
+
+  app.post('/etterem_torles', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
+    })
+    connection.connect()
+    connection.query('DELETE FROM etterem WHERE etterem.id='+req.body.bevitel1, function (err, rows, fields) {
+      if (err) throw err
+      //console.log("Szavazatát rögzítettük!")
+      res.send("Sikeres törlés!")
+    })
+    connection.end()
+  })
+
+  app.post('/ellenorzes', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('SELECT foglalas.foglalas_id, asztalok.asztal_megnevezes, asztalok.fo, foglalas.asztalok_id, datum, ora, foglalt FROM foglalas INNER JOIN asztalok ON foglalas.asztalok_id=asztalok.asztalok_id WHERE foglalas.etterem_id = ? AND foglalas.datum = ? AND foglalas.ora BETWEEN "'+req.body.bevitel3+':00:00" AND "'+req.body.bevitel3+':59:00" AND foglalas.foglalt = "0"',
+      [
+      req.body.bevitel1,
+      req.body.bevitel2
+      ], function (err, rows, fields) {
+      if (err) throw err
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
   
+  app.post('/foglalas', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
+    })
+      
+    connection.connect()
+      
+    connection.query('UPDATE asztalfoglalas.foglalas SET datum=?, ora="'+req.body.bevitel3+':00:00", nev=?, telefon=?, foglalt="1" WHERE foglalas_id=?',
+      [
+      req.body.bevitel2,
+      req.body.bevitel4,
+      req.body.bevitel5,
+      req.body.bevitel1
+      ], function (err, rows, fields) {
+      if (err) throw err
+      console.log(rows)
+      res.send(rows)
+    })
+    connection.end()
+  })
+
+  app.post('/etlap_felvitel', (req, res) => {
+    var mysql = require('mysql')
+    var connection = mysql.createConnection({
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
+    })
+  
+    connection.connect()
+  
+    connection.query('INSERT INTO asztalfoglalas.etlapok (etterem_id, nev, tipus_id, ar) VALUES (?, ?, ?, ?);',
+    [
+      req.body.bevitel1,
+      req.body.bevitel2,
+      req.body.bevitel3,
+      req.body.bevitel4
+    ], 
+    function (err, rows, fields) {
+      if (err) throw err
+        res.send(rows)
+        console.log(rows)
+    })
+  
+    connection.end()
+  })
 
   app.get('/etterem2', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
       
     connection.connect()
@@ -38,10 +157,10 @@ module.exports = function(app) {
   app.post('/like', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-      host: 's1.siralycore.hu',
-      user: 'asztalfoglalas',
-      password: 'istván',
-      database: 'asztalfoglalas',
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
       acquireTimeout: 1000000
     })
     
@@ -59,10 +178,10 @@ module.exports = function(app) {
   app.post('/dislike', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-      host: 's1.siralycore.hu',
-      user: 'asztalfoglalas',
-      password: 'istván',
-      database: 'asztalfoglalas',
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
       acquireTimeout: 1000000
     })
   
@@ -80,11 +199,11 @@ module.exports = function(app) {
   app.get('/velemenyek2', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
       
     connection.connect()
@@ -101,11 +220,11 @@ module.exports = function(app) {
   app.get('/rendezveny', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
       
     connection.connect()
@@ -123,11 +242,11 @@ module.exports = function(app) {
   app.post('/rendezveny2', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
       
     
@@ -145,11 +264,11 @@ module.exports = function(app) {
   app.get('/ertekelesdb', (req, res) => {
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
       
     connection.connect()
@@ -168,11 +287,11 @@ module.exports = function(app) {
 
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
   
     connection.connect()
@@ -190,11 +309,11 @@ module.exports = function(app) {
 
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
   
     connection.connect()
@@ -212,11 +331,11 @@ module.exports = function(app) {
 
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-    user: 'asztalfoglalas',
-    password: 'istván',
-    database: 'asztalfoglalas',
-    acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
   
     connection.connect()
@@ -235,11 +354,11 @@ module.exports = function(app) {
 
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
 
     connection.connect()
@@ -259,11 +378,11 @@ app.post('/vfelvi', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-user: 'asztalfoglalas',
-password: 'istván',
-database: 'asztalfoglalas',
-acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
@@ -282,11 +401,11 @@ app.post('/torol', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
@@ -303,11 +422,11 @@ app.post('/rendezvenytorles', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
@@ -324,11 +443,11 @@ app.post('/torol2', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
@@ -347,11 +466,11 @@ app.post('/kereses', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
@@ -372,11 +491,11 @@ app.post('/kereses2', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
@@ -395,16 +514,16 @@ app.post('/kereses2', (req, res) => {
 app.get('/etterem_abc_rend', (req, res) => {
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
     
   connection.connect()
     
-  connection.query('SELECT etterem.id,etterem.nev,etterem.lakcim,etterem.telefon,etterem.nyitas,etterem.kep,AVG(ertekeles.ert) AS "atlag",velemenyek.velemeny_nev,velemenyek.velemeny FROM ertekeles RIGHT JOIN etterem ON etterem.id=ertekeles.Etterem_id LEFT JOIN velemenyek ON velemenyek.Etteremid=etterem.id GROUP BY etterem.id ORDER BY etterem.nev', function (err, rows, fields) {
+  connection.query('SELECT etterem.id,etterem.nev,etterem.lakcim,etterem.telefon,etterem.nyitas,etterem.kep,ertekeles2.db,ertekeles2.db2,velemenyek.velemeny_nev,velemenyek.velemeny FROM ertekeles2 INNER JOIN etterem ON etterem.id=ertekeles2.etterem_id LEFT JOIN velemenyek ON velemenyek.Etteremid=etterem.id GROUP BY etterem.id ORDER BY etterem.nev', function (err, rows, fields) {
     if (err) throw err
     
     console.log(rows)
@@ -416,16 +535,16 @@ app.get('/etterem_abc_rend', (req, res) => {
 app.get('/etterem_abc_csok', (req, res) => {
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
     
   connection.connect()
     
-  connection.query('SELECT etterem.id,etterem.nev,etterem.lakcim,etterem.telefon,etterem.nyitas,etterem.kep,AVG(ertekeles.ert) AS "atlag",velemenyek.velemeny_nev,velemenyek.velemeny FROM ertekeles RIGHT JOIN etterem ON etterem.id=ertekeles.Etterem_id LEFT JOIN velemenyek ON velemenyek.Etteremid=etterem.id GROUP BY etterem.id  ORDER BY etterem.nev DESC', function (err, rows, fields) {
+  connection.query('SELECT etterem.id,etterem.nev,etterem.lakcim,etterem.telefon,etterem.nyitas,etterem.kep,ertekeles2.db,ertekeles2.db2,velemenyek.velemeny_nev,velemenyek.velemeny FROM ertekeles2 INNER JOIN etterem ON etterem.id=ertekeles2.etterem_id LEFT JOIN velemenyek ON velemenyek.Etteremid=etterem.id GROUP BY etterem.id ORDER BY etterem.nev DESC', function (err, rows, fields) {
     if (err) throw err
     
     console.log(rows)
@@ -437,16 +556,16 @@ app.get('/etterem_abc_csok', (req, res) => {
 app.get('/ert_rend', (req, res) => {
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
     
   connection.connect()
     
-  connection.query('SELECT etterem.id,etterem.nev,etterem.lakcim,etterem.telefon,etterem.nyitas,etterem.kep,AVG(ertekeles.ert) AS "atlag",velemenyek.velemeny_nev,velemenyek.velemeny FROM ertekeles RIGHT JOIN etterem ON etterem.id=ertekeles.Etterem_id LEFT JOIN velemenyek ON velemenyek.Etteremid=etterem.id GROUP BY etterem.id  ORDER BY atlag DESC', function (err, rows, fields) {
+  connection.query('SELECT etterem.id,etterem.nev,etterem.lakcim,etterem.telefon,etterem.nyitas,etterem.kep,ertekeles2.db,ertekeles2.db2,velemenyek.velemeny_nev,velemenyek.velemeny FROM ertekeles2 INNER JOIN etterem ON etterem.id=ertekeles2.etterem_id LEFT JOIN velemenyek ON velemenyek.Etteremid=etterem.id GROUP BY etterem.id ORDER BY ertekeles2.db DESC', function (err, rows, fields) {
     if (err) throw err
     
     console.log(rows)
@@ -474,11 +593,11 @@ app.use(fileupload());
 
     var mysql = require('mysql')
     var connection = mysql.createConnection({
-    host: 's1.siralycore.hu',
-  user: 'asztalfoglalas',
-  password: 'istván',
-  database: 'asztalfoglalas',
-  acquireTimeout: 1000000
+      host: host,
+      user: username,
+      password: passwd,
+      database: db,
+      acquireTimeout: 1000000
     })
 
     connection.connect()
@@ -497,11 +616,11 @@ app.post('/rendezvenyfeltoltes', (req, res) => {
 
   var mysql = require('mysql')
   var connection = mysql.createConnection({
-  host: 's1.siralycore.hu',
-user: 'asztalfoglalas',
-password: 'istván',
-database: 'asztalfoglalas',
-acquireTimeout: 1000000
+    host: host,
+    user: username,
+    password: passwd,
+    database: db,
+    acquireTimeout: 1000000
   })
 
   connection.connect()
